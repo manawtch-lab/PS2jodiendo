@@ -16,6 +16,13 @@ jobs:
       - name: Instalar herramientas
         run: apk add --no-cache build-base git
 
+      - name: Parche temporal - permitir fio/fileXio directo
+        # El ps2sdk actual prohíbe incluir fileio.h/fileXio.h salvo que
+        # se defina NEWLIB_PORT_AWARE. Se agrega a los flags de Makefile.ps2.
+        run: |
+          sed -i 's/-DSOUND_ON/-DSOUND_ON -DNEWLIB_PORT_AWARE/' Makefile.ps2
+          grep -n "NEWLIB_PORT_AWARE" Makefile.ps2
+
       - name: Compilar
         # El target exacto depende de Makefile.ps2; ajustar cuando lo veamos
         run: make -f Makefile.ps2 clean all
