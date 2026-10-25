@@ -8,7 +8,8 @@ EE_BIN = fceu.elf
 EE_PACKED_BIN = fceu-packed.elf
 ZLIB_DIR := ./src/zlib
 ENDIANNESS_DEFINES = -DLSB_FIRST -DLOCAL_LE=1
-PLATFORM_DEFINES = -D__PS2__ -DHAVE_ASPRINTF -Dmemcpy=mips_memcpy -Dmemset=mips_memset
+# NEWLIB_PORT_AWARE: el ps2sdk actual bloquea fileio.h/fileXio.h sin esta macro
+PLATFORM_DEFINES = -D__PS2__ -DNEWLIB_PORT_AWARE -DHAVE_ASPRINTF -Dmemcpy=mips_memcpy -Dmemset=mips_memset
 
 ifeq ($(DEBUG), 1)
 	PLATFORM_DEFINES += -O0 -g
@@ -43,7 +44,7 @@ default: all
 
 all: $(EE_BIN)
 	$(EE_STRIP) $(EE_BIN)
-	ps2-packer $(EE_BIN) $(EE_PACKED_BIN)
+	-ps2-packer $(EE_BIN) $(EE_PACKED_BIN)
 
 PS2_DIR := ./src/drivers/ps2
 IRX_DIR=$(PS2SDK)/iop/irx
