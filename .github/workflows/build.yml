@@ -1,0 +1,28 @@
+name: Build PS2 ELF
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar herramientas
+        run: apk add --no-cache build-base git
+
+      - name: Compilar
+        # El target exacto depende de Makefile.ps2; ajustar cuando lo veamos
+        run: make -f Makefile.ps2 clean all
+
+      - name: Subir ELF
+        uses: actions/upload-artifact@v4
+        with:
+          name: emulador-ps2
+          path: "*.elf"
+          if-no-files-found: error
