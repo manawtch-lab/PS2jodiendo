@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Instalar herramientas
-        run: apk add --no-cache build-base git
+        run: apk add --no-cache build-base git sed
 
       - name: Parche temporal - permitir fio/fileXio directo
         # El ps2sdk actual prohíbe incluir fileio.h/fileXio.h salvo que
@@ -22,10 +22,15 @@ jobs:
         run: |
           sed -i 's/-DSOUND_ON/-DSOUND_ON -DNEWLIB_PORT_AWARE/' Makefile.ps2
           grep -n "NEWLIB_PORT_AWARE" Makefile.ps2
+          # browser.c: el tipo se llama io_dirent_t en el SDK actual y faltaba stdlib.h
+          sed -i 's/fio_dirent_t/io_dirent_t/g' src/drivers/ps2/browser.c
+          sed -i '1i #include <stdlib.h>' src/drivers/ps2/browser.c
 
       - name: Compilar
         # El target exacto depende de Makefile.ps2; ajustar cuando lo veamos
-        run: make -f Makefile.ps2 clean all
+        # -k sigue compilando los otros archivos aunque uno falle,
+        # así un solo log muestra todos los errores pendientes
+        run: make -k -f Makefile.ps2 clean all
 
       - name: Subir ELF
         uses: actions/upload-artifact@v4
