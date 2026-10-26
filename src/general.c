@@ -38,6 +38,10 @@
 
 #include "md5.h"
 
+#ifdef HAVE_ASPRINTF
+int asprintf(char **strp, const char *fmt, ...);
+#endif
+
 static char BaseDirectory[2048];
 static char FileBase[2048];
 static char FileExt[2048];	/* Includes the . character, as in ".nes" */

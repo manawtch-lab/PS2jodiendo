@@ -36,6 +36,9 @@
 #include "input.h"
 #include "endian.h"
 
+void FCEUD_NetworkClose(void);
+int FCEUD_SendData(void *data, uint32 len);
+
 #if !defined(__LIBRETRO__) && !defined(__PS2__)
 #define NETPLAY_ENABLED
 #endif

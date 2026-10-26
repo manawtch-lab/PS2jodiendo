@@ -48,6 +48,8 @@
 #include  "crc32.h"
 #include  "vsuni.h"
 
+void FCEUD_NetworkClose(void);
+
 uint64 timestampbase;
 
 

@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <libpad.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <fileio.h>
+#include <io_common.h>
 #include <fileXio_rpc.h>
 
 #include "ps2fceu.h"
@@ -62,8 +66,6 @@ extern int mountPartition(char *name);
 //---------------------------------------------------------------------------
 **/
 
-int true = 1;
-int false = 0;
 int CNF_edited = 0;
 
 int get_CNF_string(char **CNF_p_p, char **name_p_p, char **value_p_p)
@@ -75,7 +77,7 @@ start_line:
     if (*tp=='\0') return false;            // but exit at EOF
     np = tp;                                // Current pos is potential name
     if (*tp<'A') {                          // but may be a comment line
-        while ((*tp!='\r')&&(*tp!='\n')&&(tp!='\0'))
+        while ((*tp!='\r')&&(*tp!='\n')&&(*tp!='\0'))
             tp+=1;                          // Seek line end to skip comment
 
         goto start_line;                    // Go back to try next line
@@ -94,7 +96,7 @@ start_line:
     if (*tp=='\0') return false;            // but exit at EOF
     vp = tp;                                // Current pos is potential value
 
-    while ((*tp!='\r')&&(*tp!='\n')&&(tp!='\0'))
+    while ((*tp!='\r')&&(*tp!='\n')&&(*tp!='\0'))
         tp+=1;                              // Seek line end
 
     if (*tp!='\0') *tp++ = '\0';            // terminate value (passing if not EOF)
@@ -137,16 +139,16 @@ void Load_Global_CNF(char *CNF_path_p)
             strcpy(CNF_path_p, partpath);
 
             printf("partpath: %s\n", CNF_path_p);
-            fd = fileXioOpen(CNF_path_p, O_RDONLY, 0);
+            fd = fileXioOpen(CNF_path_p, FIO_O_RDONLY, 0);
         }
     }
     else {
-        fd = fioOpen(CNF_path_p, O_RDONLY);
+        fd = fioOpen(CNF_path_p, FIO_O_RDONLY);
     }
     if (fd < 0) {
         printf("Load_CNF %s Open failed %d.\r\n", CNF_path_p, fd);
         strcpy(CNF_path_p, "mc0:/FCEUMM/FCEUltra.cnf");
-        fd = fioOpen(CNF_path_p, O_RDONLY);
+        fd = fioOpen(CNF_path_p, FIO_O_RDONLY);
         if (fd < 0) {
             printf("Load_CNF %s Open failed %d.\r\n", CNF_path_p, fd);
             return;
@@ -317,7 +319,7 @@ void Load_Skin_CNF(char *CNF_path_p)
     size_t CNF_size;
     char  *RAM_p, *CNF_p, *name, *value;
 
-    fd = fioOpen(CNF_path_p, O_RDONLY);
+    fd = fioOpen(CNF_path_p, FIO_O_RDONLY);
     if (fd < 0) {
         printf("Load_CNF %s Open failed %d.\r\n", CNF_path_p, fd);
         return;
@@ -394,7 +396,7 @@ void Save_Skin_CNF(char *CNF_path_p)
     // Note that the final argument above measures accumulated string size,
     // used for fioWrite below, so it's not one of the config variables.
 
-    fd = fioOpen(CNF_path_p, O_CREAT | O_WRONLY | O_TRUNC);
+    fd = fioOpen(CNF_path_p, FIO_O_CREAT | FIO_O_WRONLY | FIO_O_TRUNC);
     if (fd >= 0) {
         if (CNF_size == fioWrite(fd, CNF_p, CNF_size))
             CNF_edited = false;
@@ -577,7 +579,7 @@ void Save_Global_CNF(char *CNF_path_p)
     // Note that the final argument above measures accumulated string size,
     // used for fioWrite below, so it's not one of the config variables.
 
-    fd = fioOpen(CNF_path_p, O_CREAT | O_WRONLY | O_TRUNC);
+    fd = fioOpen(CNF_path_p, FIO_O_CREAT | FIO_O_WRONLY | FIO_O_TRUNC);
     if (fd >= 0) {
         if (CNF_size == fioWrite(fd, CNF_p, CNF_size))
             CNF_edited = false;

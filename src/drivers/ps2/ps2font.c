@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <fileio.h>
+#include <io_common.h>
 
 #include <gsKit.h>
 #include <dmaKit.h>
@@ -65,7 +68,7 @@ int font_init(GSGLOBAL *gsGlobal)
     fontdata.CharWidth = FONT_TEX.Width / 16;
     fontdata.CharHeight = FONT_TEX.Height / 16;
 
-    int File = fioOpen(datpath, O_RDONLY);
+    int File = fioOpen(datpath, FIO_O_RDONLY);
     //fontdata.Additional=malloc( 0x100 );
     u16 temp_buffer[512];
     if (File > 0) {
